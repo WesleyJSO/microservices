@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -45,6 +46,7 @@ class OrderController {
 @Repository
 interface OrderRepository extends JpaRepository<Order, Long> {}
 @Service
+@Transactional
 @RequiredArgsConstructor
 class OrderService {
 
