@@ -1,4 +1,4 @@
-package com.ms.productsevice;
+package com.ms.productservice;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
