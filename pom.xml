@@ -11,9 +11,13 @@
 	<groupId>com.ms</groupId>
 	<artifactId>product-sevice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product-sevice</name>
+    <packaging>pom</packaging>
+    <name>product-sevice</name>
 	<description>Product Sevice</description>
-	<properties>
+    <modules>
+        <module>order-service</module>
+    </modules>
+    <properties>
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>

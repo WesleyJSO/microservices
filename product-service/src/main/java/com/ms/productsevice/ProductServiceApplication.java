@@ -100,6 +100,7 @@ class ProductResponse {
 	private BigDecimal price;
 }
 
+@Repository
 interface ProductRepository extends MongoRepository<Product, String> {}
 
 @Document(value = "product")
