@@ -14,10 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +31,8 @@ public class InventoryServiceApplication {
 	@Bean
 	public CommandLineRunner loadData(InventoryRepository inventoryRepository) {
 		return args -> {
+			inventoryRepository.deleteAll();
+
 			Inventory inventory0 = new Inventory();
 			inventory0.setSkuCode("Galaxy_watch_4");
 			inventory0.setQuantity(1000);
@@ -55,9 +54,9 @@ class InventoryController {
 
 	private final InventoryService inventoryService;
 
-	@GetMapping("{sku-code}")
-	public ResponseEntity<Boolean> isInStock(@PathVariable("sku-code") String skuCode) {
-		return ResponseEntity.ok(inventoryService.isInStock(skuCode));
+	@GetMapping
+	public ResponseEntity<List<InventoryResponse>> isInStock(@RequestParam("sku-code") List<String> skuCodes) {
+		return ResponseEntity.ok(inventoryService.isInStock(skuCodes));
 	}
 }
 
@@ -68,15 +67,24 @@ class InventoryService {
 	private final InventoryRepository inventoryRepository;
 
 	@Transactional(readOnly = true)
-	public boolean isInStock(String skuCode) {
-		return inventoryRepository.findBySkuCode(skuCode)
-				.isPresent();
+	public List<InventoryResponse> isInStock(List<String> skuCodes) {
+		return inventoryRepository.findBySkuCodeIn(skuCodes)
+				.stream()
+				.map(this::toInventoryResponse)
+				.toList();
+	}
+
+	private InventoryResponse toInventoryResponse(Inventory inventory) {
+		return InventoryResponse.builder()
+				.skuCode(inventory.getSkuCode())
+				.isInStock(inventory.getQuantity() > 0)
+				.build();
 	}
 }
 
 @Repository
 interface InventoryRepository extends JpaRepository<Inventory, Long> {
-	Optional<Inventory> findBySkuCode(String skuCode);
+	List<Inventory> findBySkuCodeIn(List<String> skuCodes);
 }
 
 @Getter
@@ -92,4 +100,13 @@ class Inventory {
 	private Long id;
 	private String skuCode;
 	private Integer quantity;
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+class InventoryResponse {
+	private String skuCode;
+	private Boolean isInStock;
 }
