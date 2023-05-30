@@ -25,7 +25,7 @@ import java.util.function.Function;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public void placeOrder(OrderRequest orderRequest) {
 
@@ -46,8 +46,9 @@ public class OrderService {
 
         Function<UriBuilder, URI> buildUriParams = uriBuilder -> uriBuilder.queryParam("sku-code", skuCodes).build();
 
-        InventoryResponse[] inventoryResponses = webClient.get()
-                .uri("http://localhost:8890/api/inventory", buildUriParams)
+        InventoryResponse[] inventoryResponses = webClientBuilder.build()
+                .get()
+                .uri("http://inventory-service/api/inventory", buildUriParams)
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
